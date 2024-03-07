@@ -1,6 +1,9 @@
-from .transaction import STransaction, SAddressTransaction
+from .input import SInput
+from .output import SOutput
+from .transaction import STransaction
 
 __all__ = [
     "STransaction",
-    "SAddressTransaction",
+    "SInput",
+    "SOutput"
 ]

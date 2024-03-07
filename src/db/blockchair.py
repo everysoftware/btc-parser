@@ -2,7 +2,7 @@ import csv
 
 from py2neo import Graph, Node, Relationship
 
-from src.schemes import STransaction
+from src.schemes import STransaction, SInput, SOutput
 
 graph = Graph("bolt://localhost:7687", auth=("neo4j", "password"))
 
@@ -22,7 +22,7 @@ def process_transactions(transactions: csv.DictReader) -> None:
 
 def process_inputs(inputs: csv.DictReader) -> None:
     for item in inputs:
-        model = STransaction.model_validate(item)
+        model = SInput.model_validate(item)
 
         node = Node(
             "Input",
@@ -39,7 +39,7 @@ def process_inputs(inputs: csv.DictReader) -> None:
 
 def process_outputs(outputs: csv.DictReader) -> None:
     for output in outputs:
-        model = STransaction.model_validate(output)
+        model = SOutput.model_validate(output)
 
         node = Node(
             "Output",
@@ -48,7 +48,7 @@ def process_outputs(outputs: csv.DictReader) -> None:
 
         graph.create(node)
 
-        transaction_node = graph.nodes.match(
+        transaction = graph.nodes.match(
             "Transaction", id=model.transaction_hash
         ).first()
-        graph.create(Relationship(transaction_node, "OUTPUT_TO", node))
+        graph.create(Relationship(transaction, "OUTPUT_TO", node))

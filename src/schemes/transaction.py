@@ -24,10 +24,3 @@ class STransaction(SBase):
     fee_per_kwu: float
     fee_per_kwu_usd: float
     cdd_total: float
-
-
-class SAddressTransaction(SBase):
-    block_id: int
-    hash: str
-    time: str
-    balance_change: int
