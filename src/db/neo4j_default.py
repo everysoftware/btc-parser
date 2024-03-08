@@ -2,12 +2,28 @@ import csv
 
 from neo4j import Session
 
-from src.db.neo4j import Neo4jStorage
+from src.db.neo4j_base import Neo4jStorage
 from src.schemes import STransaction, SInput, SOutput
 
 
-class EfficientNeo4jStorage(Neo4jStorage):
-    def _process_transactions(self, session: Session, transactions: csv.DictReader) -> int:
+class DefaultNeo4jStorage(Neo4jStorage):
+    def process_dump(
+        self,
+        transactions: csv.DictReader,
+        inputs: csv.DictReader,
+        outputs: csv.DictReader,
+    ) -> int:
+        """Обработка данных из csv-файлов и запись в базу данных."""
+        with self.driver.session() as session:
+            total = self._process_transactions(session, transactions)
+            self._process_inputs(session, inputs)
+            self._process_outputs(session, outputs)
+
+            return total
+
+    def _process_transactions(
+        self, session: Session, transactions: csv.DictReader
+    ) -> int:
         """Обработка транзакций и запись в базу данных."""
         transaction_list = [
             STransaction.model_validate(transaction).model_dump()
@@ -35,13 +51,17 @@ class EfficientNeo4jStorage(Neo4jStorage):
             WITH i
             MATCH (t:Transaction {hash: i.transaction_hash})
             MERGE (i)-[:INPUT_TO]->(t)
+            MERGE (u:User {address: i.recipient})
+            MERGE (t)-[:TRANSACTION_FROM]->(u)
             """,
             {"props": input_list},
         )
 
     def _process_outputs(self, session: Session, outputs: csv.DictReader) -> None:
         """Обработка выходов и запись в базу данных."""
-        output_list = [SOutput.model_validate(output).model_dump() for output in outputs]
+        output_list = [
+            SOutput.model_validate(output).model_dump() for output in outputs
+        ]
 
         session.run(
             """
@@ -50,6 +70,8 @@ class EfficientNeo4jStorage(Neo4jStorage):
             WITH o
             MATCH (t:Transaction {hash: o.transaction_hash})
             MERGE (t)-[:OUTPUT_TO]->(o)
+            MERGE (u:User {address: o.recipient})
+            MERGE (t)-[:TRANSACTION_TO]->(u)
             """,
             {"props": output_list},
         )

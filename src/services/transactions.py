@@ -1,6 +1,6 @@
 import csv
 import datetime
-from typing import Sequence
+from typing import Sequence, Literal
 
 from src.blockchair import BlockchairClient
 from src.db.base import Storage
@@ -9,7 +9,7 @@ from src.exceptions import (
     InputNotFoundError,
     OutputNotFoundError,
 )
-from src.schemes import LoadDumpResponse
+from src.schemes import LoadDumpResponse, STransaction
 
 
 class TransactionService:
@@ -43,3 +43,9 @@ class TransactionService:
         total = self.storage.process_dump(*await self._get_dump(date))
 
         return LoadDumpResponse(total=total)
+
+    def get_transactions_by_address(
+        self, address: str, transaction_type: Literal["from", "to", "all"] = "all"
+    ) -> list[STransaction]:
+        """Получение списка транзакций по адресу."""
+        return self.storage.get_transactions_by_address(address, transaction_type)

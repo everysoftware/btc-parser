@@ -4,12 +4,28 @@ from contextlib import suppress
 from neo4j import Session
 from neo4j.exceptions import ConstraintError
 
-from src.db.neo4j import Neo4jStorage
+from src.db.neo4j_base import Neo4jStorage
 from src.schemes import STransaction, SInput, SOutput
 
 
-class NaiveNeo4jStorage(Neo4jStorage):
-    def _process_transactions(self, session: Session, transactions: csv.DictReader) -> int:
+class DraftNeo4jStorage(Neo4jStorage):
+    def process_dump(
+        self,
+        transactions: csv.DictReader,
+        inputs: csv.DictReader,
+        outputs: csv.DictReader,
+    ) -> int:
+        """Обработка данных из csv-файлов и запись в базу данных."""
+        with self.driver.session() as session:
+            total = self._process_transactions(session, transactions)
+            self._process_inputs(session, inputs)
+            self._process_outputs(session, outputs)
+
+            return total
+
+    def _process_transactions(
+        self, session: Session, transactions: csv.DictReader
+    ) -> int:
         """Обработка транзакций и запись в базу данных."""
         total = 0
 
