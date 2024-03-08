@@ -4,16 +4,16 @@ from typing import Literal
 from fastapi import APIRouter, Depends, Query, Path
 
 from src.deps import transaction_service
-from src.schemes import LoadDumpResponse, STransaction
+from src.schemes import SLoadDumpResponse, STransaction, STransactionPage
 from src.services import TransactionService
 
 router = APIRouter(tags=["Transactions"])
 
 
-@router.get(
+@router.post(
     "/load_dump",
-    response_model=LoadDumpResponse,
-    description="Загружает транзакции с Blockchair за указанную дату",
+    response_model=SLoadDumpResponse,
+    description="Загружает транзакции с Blockchair за указанную дату в базу данных",
     response_description="Информация о загруженных транзакциях",
 )
 async def load_dump(
@@ -25,7 +25,7 @@ async def load_dump(
 
 @router.get(
     "/address/{address}",
-    response_model=list[STransaction],
+    response_model=STransactionPage,
     description="Возвращает список транзакций по адресу",
     response_description="Список транзакций",
 )

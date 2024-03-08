@@ -12,9 +12,9 @@ class Storage(Protocol):
 
     def process_dump(
         self,
-        transactions: csv.DictReader,
-        inputs: csv.DictReader,
-        outputs: csv.DictReader,
+        transactions_path: str,
+        inputs_path: str,
+        outputs_path: str,
     ) -> int:
         """Обработка данных из csv-файлов и запись в базу данных."""
         pass

@@ -9,21 +9,25 @@ from src.schemes import STransaction, SInput, SOutput
 class DefaultNeo4jStorage(Neo4jStorage):
     def process_dump(
         self,
-        transactions: csv.DictReader,
-        inputs: csv.DictReader,
-        outputs: csv.DictReader,
+        transactions_path: str,
+        inputs_path: str,
+        outputs_path: str,
     ) -> int:
         """Обработка данных из csv-файлов и запись в базу данных."""
         with self.driver.session() as session:
-            total = self._process_transactions(session, transactions)
-            self._process_inputs(session, inputs)
-            self._process_outputs(session, outputs)
+            with open(transactions_path) as transactions_f, open(
+                inputs_path
+            ) as inputs_f, open(outputs_path) as outputs_f:
+                total = self._process_transactions(
+                    session, csv.DictReader(transactions_f, delimiter="\t")
+                )
+                self._process_inputs(session, csv.DictReader(inputs_f, delimiter="\t"))
+                self._process_outputs(session, csv.DictReader(outputs_f, delimiter="\t"))
 
             return total
 
-    def _process_transactions(
-        self, session: Session, transactions: csv.DictReader
-    ) -> int:
+    @staticmethod
+    def _process_transactions(session: Session, transactions: csv.DictReader) -> int:
         """Обработка транзакций и запись в базу данных."""
         transaction_list = [
             STransaction.model_validate(transaction).model_dump()
@@ -40,7 +44,8 @@ class DefaultNeo4jStorage(Neo4jStorage):
 
         return len(transaction_list)
 
-    def _process_inputs(self, session: Session, inputs: csv.DictReader) -> None:
+    @staticmethod
+    def _process_inputs(session: Session, inputs: csv.DictReader) -> None:
         """Обработка входов и запись в базу данных."""
         input_list = [SInput.model_validate(item).model_dump() for item in inputs]
 
@@ -57,7 +62,8 @@ class DefaultNeo4jStorage(Neo4jStorage):
             {"props": input_list},
         )
 
-    def _process_outputs(self, session: Session, outputs: csv.DictReader) -> None:
+    @staticmethod
+    def _process_outputs(session: Session, outputs: csv.DictReader) -> None:
         """Обработка выходов и запись в базу данных."""
         output_list = [
             SOutput.model_validate(output).model_dump() for output in outputs

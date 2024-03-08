@@ -1,4 +1,3 @@
-import csv
 import datetime
 from typing import Sequence, Literal
 
@@ -9,7 +8,7 @@ from src.exceptions import (
     InputNotFoundError,
     OutputNotFoundError,
 )
-from src.schemes import LoadDumpResponse, STransaction
+from src.schemes import SLoadDumpResponse, STransactionPage
 
 
 class TransactionService:
@@ -17,35 +16,38 @@ class TransactionService:
         self.storage = storage
         self.client = client
 
-    async def _get_dump(self, date: datetime.date) -> Sequence[csv.DictReader]:
+    async def _load_dumps(self, date: datetime.date) -> Sequence[str]:
         """Получение дампа транзакций, входов и выходов."""
-        transactions = await self.client.get_dump(date, "transactions")
+        transactions = await self.client.load_dump(date, "transactions")
 
         if transactions is None:
             raise TransactionNotFoundError()
 
-        inputs = await self.client.get_dump(date, "inputs")
+        inputs = await self.client.load_dump(date, "inputs")
 
         if inputs is None:
             raise InputNotFoundError()
 
-        outputs = await self.client.get_dump(date, "outputs")
+        outputs = await self.client.load_dump(date, "outputs")
 
         if outputs is None:
             raise OutputNotFoundError()
 
         return transactions, inputs, outputs
 
-    async def load_dump(self, date: datetime.date) -> LoadDumpResponse:
+    async def load_dump(self, date: datetime.date) -> SLoadDumpResponse:
         """Загрузка дампа транзакций, входов и выходов в базу данных."""
         self.storage.create_constraints()
 
-        total = self.storage.process_dump(*await self._get_dump(date))
+        dumps = await self._load_dumps(date)
 
-        return LoadDumpResponse(total=total)
+        total = self.storage.process_dump(*dumps)
+
+        return SLoadDumpResponse(total=total)
 
     def get_transactions_by_address(
-        self, address: str, transaction_type: Literal["from", "to", "all"] = "all"
-    ) -> list[STransaction]:
+            self, address: str, transaction_type: Literal["from", "to", "all"] = "all"
+    ) -> STransactionPage:
         """Получение списка транзакций по адресу."""
-        return self.storage.get_transactions_by_address(address, transaction_type)
+        transactions = self.storage.get_transactions_by_address(address, transaction_type)
+        return STransactionPage(transactions=transactions, total=len(transactions))
