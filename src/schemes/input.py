@@ -12,7 +12,7 @@ class SInput(SBase):
     type: str
     script_hex: str
     is_from_coinbase: bool
-    is_spendable: bool
+    is_spendable: int
     spending_block_id: int
     spending_transaction_hash: str
     spending_index: int

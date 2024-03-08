@@ -15,9 +15,9 @@ class BlockchairClient:
     """Базовый URL для дампов."""
 
     async def get_dump(
-            self,
-            date: datetime.date,
-            dump_type: Literal["transactions", "inputs", "outputs"],
+        self,
+        date: datetime.date,
+        dump_type: Literal["transactions", "inputs", "outputs"],
     ) -> csv.DictReader | None:
         """Получает дамп транзакций за день."""
         date_str = date.strftime("%Y%m%d")

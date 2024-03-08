@@ -12,4 +12,4 @@ class SOutput(SBase):
     type: str
     script_hex: str
     is_from_coinbase: bool
-    is_spendable: bool
+    is_spendable: int
