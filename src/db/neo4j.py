@@ -8,15 +8,15 @@ from src.schemes import STransaction, SInput, SOutput
 
 class DefaultNeo4jStorage(Neo4jStorage):
     def process_dump(
-        self,
-        transactions_path: str,
-        inputs_path: str,
-        outputs_path: str,
+            self,
+            transactions_path: str,
+            inputs_path: str,
+            outputs_path: str,
     ) -> int:
         """Обработка данных из csv-файлов и запись в базу данных."""
         with self.driver.session() as session:
             with open(transactions_path) as transactions_f, open(
-                inputs_path
+                    inputs_path
             ) as inputs_f, open(outputs_path) as outputs_f:
                 total = self._process_transactions(
                     session, csv.DictReader(transactions_f, delimiter="\t")

@@ -4,7 +4,7 @@ from typing import Literal
 from fastapi import APIRouter, Depends, Query, Path
 
 from src.deps import transaction_service
-from src.schemes import SLoadDumpResponse, STransaction, STransactionPage
+from src.schemes import SLoadDumpResponse, STransactionPage
 from src.services import TransactionService
 
 router = APIRouter(tags=["Transactions"])
@@ -17,8 +17,8 @@ router = APIRouter(tags=["Transactions"])
     response_description="Информация о загруженных транзакциях",
 )
 async def load_dump(
-    date: datetime.date = Query(example=datetime.date(2009, 1, 12), description="Дата"),
-    service: TransactionService = Depends(transaction_service),
+        date: datetime.date = Query(example=datetime.date(2009, 1, 12), description="Дата"),
+        service: TransactionService = Depends(transaction_service),
 ):
     return await service.load_dump(date)
 
@@ -30,12 +30,12 @@ async def load_dump(
     response_description="Список транзакций",
 )
 async def get_transactions_by_address(
-    address: str = Path(
-        example="1JbkESTdQEvWVXdyB3fr6PbXYhJqyiYngR", description="Адрес"
-    ),
-    transaction_type: Literal["from", "to", "all"] = Query(
-        "all", description="Тип транзакции"
-    ),
-    service: TransactionService = Depends(transaction_service),
+        address: str = Path(
+            example="12cbQLTFMXRnSzktFkuoG3eHoMeFtpTu3S", description="Адрес"
+        ),
+        transaction_type: Literal["from", "to", "all"] = Query(
+            "all", description="Тип транзакции"
+        ),
+        service: TransactionService = Depends(transaction_service),
 ):
     return service.get_transactions_by_address(address, transaction_type)

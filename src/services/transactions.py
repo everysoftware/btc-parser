@@ -1,5 +1,5 @@
 import datetime
-from typing import Sequence, Literal
+from typing import Literal
 
 from src.blockchair import BlockchairClient
 from src.db.base import Storage
@@ -16,7 +16,7 @@ class TransactionService:
         self.storage = storage
         self.client = client
 
-    async def _load_dumps(self, date: datetime.date) -> Sequence[str]:
+    async def _load_dumps(self, date: datetime.date) -> tuple[str, str, str]:
         """Получение дампа транзакций, входов и выходов."""
         transactions = await self.client.load_dump(date, "transactions")
 

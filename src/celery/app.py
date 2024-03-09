@@ -10,7 +10,7 @@ app = Celery("tasks", broker=REDIS_DSN, backend=REDIS_DSN)
 
 
 @app.task
-def load_dump() -> None:
+def load_dump() -> int:
     """Загрузка дампа транзакций с Blockchair за предыдущий день."""
     date = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
     # date = "2009-01-12"
@@ -19,7 +19,7 @@ def load_dump() -> None:
         f"http://localhost:8000/load_dump?date={date}",
     )
 
-    return result.json()
+    return result.status_code
 
 
 @app.on_after_configure.connect
