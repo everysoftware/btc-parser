@@ -22,7 +22,9 @@ class DefaultNeo4jStorage(Neo4jStorage):
                     session, csv.DictReader(transactions_f, delimiter="\t")
                 )
                 self._process_inputs(session, csv.DictReader(inputs_f, delimiter="\t"))
-                self._process_outputs(session, csv.DictReader(outputs_f, delimiter="\t"))
+                self._process_outputs(
+                    session, csv.DictReader(outputs_f, delimiter="\t")
+                )
 
             return total
 
