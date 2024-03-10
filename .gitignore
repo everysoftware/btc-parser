@@ -2,3 +2,5 @@
 .idea
 dumps
 dumps_example
+docker
+docker-compose.yml

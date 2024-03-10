@@ -10,16 +10,20 @@ class Storage(Protocol):
         pass
 
     def process_dump(
-            self,
-            transactions_path: str,
-            inputs_path: str,
-            outputs_path: str,
+        self,
+        transactions_path: str,
+        inputs_path: str,
+        outputs_path: str,
     ) -> int:
         """Обработка данных из csv-файлов и запись в базу данных."""
         pass
 
     def get_transactions_by_address(
-            self, address: str, transaction_type: Literal["from", "to", "all"]
+        self,
+        address: str,
+        transaction_type: Literal["from", "to", "all"] = "all",
+        limit: int = 100,
+        offset: int = 0,
     ) -> list[STransaction]:
         """Получение списка транзакций по адресу."""
         pass

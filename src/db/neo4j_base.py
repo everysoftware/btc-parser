@@ -38,9 +38,18 @@ class Neo4jStorage(Storage):
                 CREATE CONSTRAINT IF NOT EXISTS FOR (u:User) REQUIRE u.address IS UNIQUE
             """
             )
+            session.run(
+                """
+                CREATE INDEX IF NOT EXISTS FOR (u:User) ON (u.address)
+            """
+            )
 
     def get_transactions_by_address(
-        self, address: str, transaction_type: Literal["from", "to", "all"] = "all"
+        self,
+        address: str,
+        transaction_type: Literal["from", "to", "all"] = "all",
+        limit: int = 100,
+        offset: int = 0,
     ) -> list[STransaction]:
         """Получение транзакций по адресу."""
 
@@ -51,24 +60,36 @@ class Neo4jStorage(Storage):
                         """
                         MATCH (t:Transaction)-[:TRANSACTION_TO]->(u:User {address: $address})
                         RETURN t
+                        SKIP $offset
+                        LIMIT $limit
                         """,
                         address=address,
+                        limit=limit,
+                        offset=offset,
                     )
                 case "to":
                     result = session.run(
                         """
                         MATCH (t:Transaction)-[:TRANSACTION_FROM]->(u:User {address: $address})
                         RETURN t
+                        SKIP $offset
+                        LIMIT $limit
                         """,
                         address=address,
+                        limit=limit,
+                        offset=offset,
                     )
                 case "all":
                     result = session.run(
                         """
                         MATCH (t:Transaction)-[:TRANSACTION_FROM|TRANSACTION_TO]->(u:User {address: $address})
                         RETURN DISTINCT t
+                        SKIP $offset
+                        LIMIT $limit
                         """,
                         address=address,
+                        limit=limit,
+                        offset=offset,
                     )
                 case _:
                     raise ValueError("Invalid transaction type")

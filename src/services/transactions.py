@@ -46,10 +46,14 @@ class TransactionService:
         return SLoadDumpResponse(total=total)
 
     def get_transactions_by_address(
-        self, address: str, transaction_type: Literal["from", "to", "all"] = "all"
+        self,
+        address: str,
+        transaction_type: Literal["from", "to", "all"] = "all",
+        limit: int = 100,
+        offset: int = 0,
     ) -> STransactionPage:
         """Получение списка транзакций по адресу."""
         transactions = self.storage.get_transactions_by_address(
-            address, transaction_type
+            address, transaction_type, limit, offset
         )
         return STransactionPage(transactions=transactions, total=len(transactions))
