@@ -4,9 +4,9 @@ import requests
 from celery import Celery
 from celery.schedules import crontab
 
-REDIS_DSN = "redis://localhost:6379/0"
+from src.config import settings
 
-app = Celery("tasks", broker=REDIS_DSN, backend=REDIS_DSN)
+app = Celery("tasks", broker=settings.redis_url, backend=settings.redis_url)
 
 
 @app.task

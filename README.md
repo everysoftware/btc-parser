@@ -14,20 +14,27 @@ Celery и Redis.
 
 ## Установка
 
-1. Установить Redis и Neo4j
-2. Установить Python 3.11.2
-3. Установить зависимости
+1. Установить Redis и Neo4j 5.12.0-enterprise
+2. Настроить переменные окружения в файле `.env`
+3. Установить Python 3.11.2
+4. Развернуть виртуальное окружение и переключиться в него
+    ```bash
+    python -m venv venv
+    venv/Scripts/activate
+    ```
+5. Установить зависимости
     ```bash
     pip install -r requirements.txt
     ```
-4. Запустить Neo4j и Redis
-5. Запустить веб-сервер
+6. Запустить Neo4j и Redis
+7. Запустить веб-сервер
    ```bash
    make run
    ```
-6. Запустить celery в отдельном терминале
+8. Запустить celery в отдельных терминалах:
    ```bash
-   make celery
+   make worker
    make beat
    ```
-7. Готово! Приложение доступно на http://localhost:8000/docs
+9. Готово! Приложение доступно на http://localhost:8000/docs
+

@@ -2,6 +2,7 @@ from typing import Literal
 
 from neo4j import GraphDatabase, basic_auth, Driver
 
+from src.config import settings
 from src.db.base import Storage
 from src.schemes import STransaction
 
@@ -11,7 +12,8 @@ class Neo4jStorage(Storage):
 
     def __init__(self):
         self.driver = GraphDatabase.driver(
-            "bolt://localhost:7687", auth=basic_auth("neo4j", "password")
+            settings.neo4j_url,
+            auth=basic_auth(settings.neo4j_user, settings.neo4j_password),
         )
         self.driver.verify_connectivity()
 
